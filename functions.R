@@ -11,14 +11,34 @@ library(readr)
 
 dataframe_preprocess <- function(mydata){
   
-  mydata <- mydata %>%
+  df1 <- mydata %>%
     mutate(issue_date = dmy(paste('01', issue_date, sep = '-')), # Change the date
-           int_rate = as.numeric(gsub("%", "", int_rate)),
-           average = (prob_xgb + prob_gbm + prob_subgrade)/3) # Remove the % from int_rate
+           int_rate = as.numeric(gsub("%", "", int_rate))) %>% 
+    select(-starts_with('prob'))
   
-  return(mydata)
+  df2 <- mydata %>%
+    select(starts_with('prob')) %>%
+    mutate(average = rowMeans(.))
+  
+  df_comb <- cbind(df1, df2)
+  
+  return(df_comb)
 }
 
+
+add_qtr <- function(mydata){
+  
+  mydata <- dataframe_preprocess(mydata)
+  
+  qtr_vec <- mydata %>%
+    mutate(quarter = paste('Q', quarter(issue_date), sep = ''),
+           quarter_year = paste(year(issue_date), quarter, sep = '')) %>%
+    pull(quarter_year)
+  
+  qtr_vec <- unique(qtr_vec)[order(unique(qtr_vec))]
+  
+  return(qtr_vec)
+}
 
 filter_grade <- function(mydata, grade_){
   mydata <- dataframe_preprocess(mydata)

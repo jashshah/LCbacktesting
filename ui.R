@@ -9,6 +9,7 @@ shinyUI(fluidPage(
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
     sidebarPanel(
+      fileInput(inputId = "upload", label = "Upload File Here", multiple = FALSE, width = NULL),
        numericInput(inputId = 'cutoff_b',
                     label = 'Grade B Percentile Cutoff',
                     min = 0,
@@ -34,7 +35,8 @@ shinyUI(fluidPage(
                     value = 0.65, 
                     step = 0.05),
        uiOutput('quarter'),
-       submitButton('Submit')
+       # submitButton('Submit')
+      actionButton('update', label = 'Confirm')
     ),
     
     # Show a plot of the generated distribution
